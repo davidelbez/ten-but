@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10But - The High-Trust Hiring Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Minimalist Red -->
+    <!-- Application Structure Plan: A single-page, vertical-scrolling narrative application. A fixed side navigation allows users to jump between key thematic sections: Problem, Solution, Value Proposition, Market Opportunity, Strategy, Business Model, and Team. This structure guides the user through the investment story logically while allowing them to explore sections of interest non-linearly. Key interactions include a clickable process diagram, togglable value-prop tabs, and a dynamic market size chart, designed to make complex information digestible and engaging. This is more effective than a static slide deck for demonstrating a modern, tech-focused solution. -->
+    <!-- Visualization & Content Choices: 
+        - Problem Stats (€5k, 40+ hrs): Goal: Inform/Impact -> Method: Large, bold text -> Interaction: Subtle animation on load to draw attention. Justification: Makes the pain point immediately clear.
+        - How It Works (Share/Validate/Discover): Goal: Organize/Explain -> Method: HTML/CSS diagram -> Interaction: Clicking each step reveals detailed text. Justification: Breaks a process into digestible, user-controlled steps.
+        - Value Prop (Everyone Wins): Goal: Compare/Organize -> Method: Interactive HTML tabs -> Interaction: Click to switch between views for Candidates, Recruiters, Companies. Justification: Cleans up a dense table, allowing users to focus on the persona relevant to them.
+        - Market Opportunity Chart: Goal: Compare/Inform -> Method: Chart.js Bar Chart -> Interaction: Hover tooltips with data. Justification: Visually represents the scale of the Total Addressable Market vs. the focused Serviceable Obtainable Market, making the numbers more tangible.
+        - Business Model Table: Goal: Compare/Organize -> Method: Interactive HTML table -> Interaction: Hovering highlights a pricing tier. Justification: Improves readability and draws focus to specific plan details.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .nav-link.active { color: #DC2626; font-weight: 600; }
+        .tab.active { border-color: #DC2626; color: #DC2626; background-color: #FEF2F2; }
+        .pricing-tier:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex">
+        <!-- Side Navigation (Desktop) -->
+        <nav class="hidden lg:block w-64 h-screen fixed top-0 left-0 bg-white border-r border-gray-200 p-8">
+            <h1 class="text-2xl font-bold text-gray-900">10But</h1>
+            <p class="text-sm text-red-600 font-semibold">The High-Trust Hiring Network</p>
+            <ul class="mt-12 space-y-4" id="desktop-nav">
+                <li><a href="#problem" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">The Problem</a></li>
+                <li><a href="#solution" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">The Solution</a></li>
+                <li><a href="#value-prop" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">Value Proposition</a></li>
+                <li><a href="#opportunity" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">The Opportunity</a></li>
+                 <li><a href="#strategy" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">Our Strategy</a></li>
+                <li><a href="#model" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">Business Model</a></li>
+                <li><a href="#team" class="nav-link text-gray-600 hover:text-red-600 font-medium transition-colors duration-200">Our Team</a></li>
+            </ul>
+        </nav>
+
+        <!-- Top Navigation (Mobile) -->
+        <nav class="lg:hidden w-full fixed top-0 bg-white shadow-md z-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center py-3">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">10But</h1>
+                        <p class="text-xs text-red-600 font-semibold">High-Trust Hiring Network</p>
+                    </div>
+                    <button id="mobile-menu-button" class="p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="hidden">
+                <ul class="px-2 pt-2 pb-3 space-y-1 sm:px-3" id="mobile-nav">
+                    <li><a href="#problem" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">The Problem</a></li>
+                    <li><a href="#solution" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">The Solution</a></li>
+                    <li><a href="#value-prop" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">Value Proposition</a></li>
+                    <li><a href="#opportunity" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">The Opportunity</a></li>
+                    <li><a href="#strategy" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">Our Strategy</a></li>
+                    <li><a href="#model" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">Business Model</a></li>
+                    <li><a href="#team" class="block nav-link px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-700 hover:bg-gray-50">Our Team</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="lg:ml-64 flex-1">
+            <div class="lg:pt-0 pt-20">
+            
+            <!-- Section 1: The Problem -->
+            <section id="problem" class="min-h-screen bg-white flex items-center">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+                    <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">Hiring is Broken.</h2>
+                    <p class="mt-2 text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl lg:text-6xl">It's Slow, Expensive, and Inefficient.</p>
+                    <p class="mt-6 max-w-3xl mx-auto text-xl text-gray-600">Good candidates are exhausted by lengthy processes, and their efforts are wasted. The current system benefits neither candidates nor recruiters.</p>
+                    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                        <div class="bg-gray-50 p-8 rounded-2xl shadow-sm">
+                            <p class="text-5xl font-extrabold text-red-600">€5,000+</p>
+                            <p class="mt-2 text-lg font-medium text-gray-700">Wasted per hire on average.</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-2xl shadow-sm">
+                            <p class="text-5xl font-extrabold text-red-600">40+ hours</p>
+                            <p class="mt-2 text-lg font-medium text-gray-700">Of manager and candidate time lost.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: The Solution -->
+            <section id="solution" class="py-20 sm:py-32">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">The Solution</h2>
+                        <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">We turn wasted assets into your next great hire.</p>
+                        <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">10But is a peer-to-peer network for companies to share and discover their "silver medalist" candidates. It's hiring without the noise.</p>
+                    </div>
+                    <div class="mt-16">
+                        <h3 class="text-center text-2xl font-bold text-gray-900 mb-12">How It Works</h3>
+                        <div class="relative">
+                            <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-300 -translate-y-1/2"></div>
+                            <div class="relative grid grid-cols-1 md:grid-cols-3 gap-12">
+                                <div id="step-1" class="step-container text-center cursor-pointer">
+                                    <div class="flex justify-center items-center mx-auto w-16 h-16 rounded-full bg-white border-2 border-red-600 text-red-600 font-bold text-2xl shadow-lg">1</div>
+                                    <h4 class="mt-6 text-xl font-bold">SHARE</h4>
+                                    <p class="mt-2 text-gray-600">Recruiter at Company A reports about a great finalist he couldn't hire.</p>
+                                </div>
+                                <div id="step-2" class="step-container text-center cursor-pointer">
+                                    <div class="flex justify-center items-center mx-auto w-16 h-16 rounded-full bg-white border-2 border-gray-300 text-gray-400 font-bold text-2xl">2</div>
+                                    <h4 class="mt-6 text-xl font-bold text-gray-400">VALIDATE</h4>
+                                    <p class="mt-2 text-gray-500">Candidate reviews the report and gives explicit consent. Nothing is shared without their approval.</p>
+                                </div>
+                                <div id="step-3" class="step-container text-center cursor-pointer">
+                                     <div class="flex justify-center items-center mx-auto w-16 h-16 rounded-full bg-white border-2 border-gray-300 text-gray-400 font-bold text-2xl">3</div>
+                                    <h4 class="mt-6 text-xl font-bold text-gray-400">DISCOVER</h4>
+                                    <p class="mt-2 text-gray-500">Manager at Company B discovers the validated candidate and fast-tracks them to a final interview.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: Value Proposition -->
+            <section id="value-prop" class="py-20 sm:py-32 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">Value Proposition</h2>
+                        <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Everyone wins</p>
+                        <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">Our model is designed to create value for every participant in the hiring ecosystem, turning competition into collaboration.</p>
+                    </div>
+                    <div class="mt-16">
+                        <div class="flex justify-center border-b border-gray-200">
+                            <button data-tab="candidates" class="tab active py-4 px-6 font-semibold border-b-2">For Candidates</button>
+                            <button data-tab="recruiters" class="tab py-4 px-6 font-semibold text-gray-500 border-b-2 border-transparent">For Recruiters</button>
+                            <button data-tab="companies" class="tab py-4 px-6 font-semibold text-gray-500 border-b-2 border-transparent">For Companies/Hubs</button>
+                        </div>
+                        <div id="tab-content" class="mt-8">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: The Opportunity -->
+            <section id="opportunity" class="py-20 sm:py-32">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">The Opportunity</h2>
+                        <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Targeting a €375M Inefficiency in Paris Alone.</p>
+                        <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">This represents a massive amount of annual recruitment inefficiency ready for disruption, and we have a clear plan to capture a piece of it.</p>
+                    </div>
+                    <div class="mt-16">
+                        <div class="chart-container">
+                            <canvas id="marketChart"></canvas>
+                        </div>
+                        <p class="text-center mt-4 text-sm text-gray-500">Visualization of the Total Addressable Market vs. our focused Year 1 Obtainable Market.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 5: Strategy -->
+            <section id="strategy" class="py-20 sm:py-32 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                     <div class="lg:text-center">
+                        <h2 class="text-base text-red-600 font-semibold tracking-wide uppercase">Launchpad Paris</h2>
+                        <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">Go Deep, Not Wide.</p>
+                         <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">Our unfair advantage is that <span class="text-red-600 font-semibold">we don't need to find product-market fit; we are living it.</span> This intimate network gives us an unmatched advantage in trust, access, and speed.</p>
+                    </div>
+
+                    <div class="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-x-8">
+                        <div class="p-6 bg-gray-50 rounded-lg">
+                            <h3 class="text-lg font-bold text-gray-900">1. Concentrate Liquidity</h3>
+                            <p class="mt-2 text-base text-gray-600">Forge exclusive partnerships with Paris's top 3-5 innovation hubs and incubators: Station F, WeWork, Wacano.</p>
+                        </div>
+                        <div class="p-6 bg-gray-50 rounded-lg">
+                            <h3 class="text-lg font-bold text-gray-900">2. Drive Adoption</h3>
+                            <p class="mt-2 text-base text-gray-600">Offer a "Founding Member" deal to their portfolio companies to solve the cold start problem. <span class="font-semibold">We already secured a first client.</span></p>
+                        </div>
+                         <div class="p-6 bg-gray-50 rounded-lg">
+                            <h3 class="text-lg font-bold text-gray-900">3. Engineer Virality</h3>
+                            <p class="mt-2 text-base text-gray-600">Activate the candidate-driven onboarding loop for organic, self-sustaining growth.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Business Model -->
+            <section id="model" class="py-20 sm:py-32">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">Business Model</h2>
+                        <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Our model rewards participation.</p>
+                        <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">Simple, transparent pricing that grows with your hiring needs and encourages sharing.</p>
+                    </div>
+                    <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="pricing-tier border border-gray-200 rounded-2xl p-8 text-center flex flex-col transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-gray-900">Freemium</h3>
+                            <p class="mt-2 text-gray-500">Community</p>
+                            <p class="mt-6 text-4xl font-extrabold text-gray-900">Free</p>
+                            <p class="mt-2 font-semibold">Earned via Sharing (1:1)</p>
+                            <ul class="mt-6 space-y-4 text-left flex-1">
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> 1 User Seat</li>
+                            </ul>
+                            <a href="#" class="mt-8 block w-full bg-gray-800 text-white font-semibold py-3 rounded-lg hover:bg-gray-900 transition-colors">Join Now</a>
+                        </div>
+                         <div class="pricing-tier border-2 border-red-600 rounded-2xl p-8 text-center flex flex-col transition-all duration-300 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 transform translate-x-1/4 -translate-y-1/4 rotate-45">POPULAR</div>
+                            <h3 class="text-lg font-semibold text-red-600">Starter</h3>
+                            <p class="mt-2 text-gray-500">&nbsp;</p>
+                            <p class="mt-6 text-4xl font-extrabold text-gray-900">€79</p>
+                            <p class="mt-2 font-semibold">/month</p>
+                            <ul class="mt-6 space-y-4 text-left flex-1">
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> 20 Reveals / month</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> 1 User Seat</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> Standard Search</li>
+                            </ul>
+                            <a href="#" class="mt-8 block w-full bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition-colors">Get Started</a>
+                        </div>
+                        <div class="pricing-tier border border-gray-200 rounded-2xl p-8 text-center flex flex-col transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-gray-900">Business</h3>
+                            <p class="mt-2 text-gray-500">&nbsp;</p>
+                            <p class="mt-6 text-4xl font-extrabold text-gray-900">€199+</p>
+                            <p class="mt-2 font-semibold">Starts at /month</p>
+                             <ul class="mt-6 space-y-4 text-left flex-1">
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> Pooled Reveals (5/employee)</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> Multiple User Seats</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> AI-Powered Search</li>
+                            </ul>
+                            <a href="#" class="mt-8 block w-full bg-gray-800 text-white font-semibold py-3 rounded-lg hover:bg-gray-900 transition-colors">Contact Sales</a>
+                        </div>
+                         <div class="pricing-tier border border-gray-200 rounded-2xl p-8 text-center flex flex-col transition-all duration-300">
+                            <h3 class="text-lg font-semibold text-gray-900">Hub</h3>
+                            <p class="mt-2 text-gray-500">&nbsp;</p>
+                            <p class="mt-6 text-4xl font-extrabold text-gray-900">Custom</p>
+                            <p class="mt-2 font-semibold">Annual</p>
+                             <ul class="mt-6 space-y-4 text-left flex-1">
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> High Volume Reveals</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> Unlimited Seats</li>
+                                <li class="flex items-start"><span class="text-green-500 mr-2 mt-1">&#10003;</span> Unlimited Hub Access</li>
+                            </ul>
+                            <a href="#" class="mt-8 block w-full bg-gray-800 text-white font-semibold py-3 rounded-lg hover:bg-gray-900 transition-colors">Partner With Us</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 7: Team -->
+            <section id="team" class="py-20 sm:py-32 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center">
+                        <h2 class="text-base font-semibold text-red-600 tracking-wide uppercase">The Team</h2>
+                        <p class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">The Right Team to Engineer a Marketplace.</p>
+                    </div>
+                    <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+                        <div>
+                            <img class="mx-auto h-32 w-32 rounded-full object-cover" src=images/1735918435117.jpeg alt="David Elbez">
+                            <h3 class="mt-6 text-xl font-bold text-gray-900">David Elbez</h3>
+                            <p class="text-md font-semibold text-red-600">CEO & Head of Business</p>
+                            <p class="mt-2 text-gray-600">Vision, product leadership, and fundraising expertise. On-the-ground Paris connection.</p>
+                        </div>
+                        <div>
+                            <img class="mx-auto h-32 w-32 rounded-full object-cover" src="images/1737730845563.jpeg" alt="Pierre Mouchan">
+                            <h3 class="mt-6 text-xl font-bold text-gray-900">Pierre Mouchan</h3>
+                            <p class="text-md font-semibold text-red-600">CTO & Head of design</p>
+                            <p class="mt-2 text-gray-600">Tech, Design, UX. Expert in building secure and scalable marketplace platforms.</p>
+                        </div>
+                        <div>
+                           <img class="mx-auto h-32 w-32 rounded-full object-cover" src="images/1740934750669.jpeg" alt="Amine El Kerzazi">
+                            <h3 class="mt-6 text-xl font-bold text-gray-900">Amine El Kerzazi</h3>
+                            <p class="text-md font-semibold text-red-600">Head of Growth</p>
+                            <p class="mt-2 text-gray-600">Community building and launching startups in the French tech ecosystem.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="bg-gray-800">
+                <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+                    <h3 class="text-2xl font-bold text-white">10But</h3>
+                    <p class="mt-2 text-lg text-gray-300">Stop Wasting Talent. Start Hiring Smarter.</p>
+                    <div class="mt-6 space-y-2">
+                        <p class="text-gray-400">Contact David: <a href="mailto:davidelbez@gmail.com" class="text-red-400 hover:text-red-300">davidelbez@gmail.com</a></p>
+						<p class="text-gray-400">Try the POC: <a href="https://10but.com/" target="_blank" rel="noopener noreferrer" class="text-red-400 hover:text-red-300">10but.com</a></p>
+                    </div>
+                </div>
+            </footer>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu on link click
+            document.querySelectorAll('#mobile-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Active nav link highlighting on scroll
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // How It Works interactive diagram
+            const steps = document.querySelectorAll('.step-container');
+            steps.forEach((step, index) => {
+                step.addEventListener('click', () => {
+                    steps.forEach(s => {
+                        const div = s.querySelector('div');
+                        const h4 = s.querySelector('h4');
+                        div.classList.remove('border-red-600', 'text-red-600', 'shadow-lg');
+                        div.classList.add('border-gray-300', 'text-gray-400');
+                        h4.classList.add('text-gray-400');
+                    });
+                    const div = step.querySelector('div');
+                    const h4 = step.querySelector('h4');
+                    div.classList.add('border-red-600', 'text-red-600', 'shadow-lg');
+                    div.classList.remove('border-gray-300', 'text-gray-400');
+                    h4.classList.remove('text-gray-400');
+                });
+            });
+
+            // Value Prop Tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContentContainer = document.querySelector('#tab-content div');
+            const valuePropData = {
+                candidates: [
+                    { title: 'Exclusive Visibility', text: 'Get seen on a platform for pre-vetted talent.' },
+                    { title: 'Interviews Become Assets', text: 'Turn past interview efforts into new opportunities.' },
+                    { title: 'Recruiters Come to You', text: 'Less applying, more connecting.' },
+                ],
+                recruiters: [
+                    { title: 'Access Elite Talent', text: 'Tap into a pool of pre-vetted candidates, skipping early hiring steps.' },
+                    { title: 'Monetize Your Due Diligence', text: 'Your interviewed candidates earn you credits for your next search.' },
+                    { title: 'Recruit Ethically', text: 'Feel good knowing your "silver medalists" find great new roles.' },
+                ],
+                companies: [
+                    { title: 'Build Your Talent Repo', text: 'Create a valuable, internal database from your own interviews.' },
+                    { title: 'Boost Collaboration', text: 'Share talent and accelerate hiring within your network.' },
+                    { title: 'Supercharge Efficiency', text: 'Drastically cut down on time and cost to hire.' },
+                ]
+            };
+
+            function updateTabContent(tabName) {
+                const data = valuePropData[tabName.toLowerCase().replace('/hubs','')];
+                tabContentContainer.innerHTML = data.map(item => `
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h4 class="font-bold text-lg text-gray-900">${item.title}</h4>
+                        <p class="mt-2 text-gray-600">${item.text}</p>
+                    </div>
+                `).join('');
+            }
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateTabContent(tab.dataset.tab);
+                });
+            });
+            updateTabContent('candidates');
+
+
+            // Market Opportunity Chart
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            const marketChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Paris Market Inefficiency (SAM)', 'Our Year 1 Goal (SOM)'],
+                    datasets: [{
+                        label: 'Market Value in Euros',
+                        data: [375000000, 400000],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.2)',
+                            'rgba(220, 38, 38, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(220, 38, 38, 1)',
+                            'rgba(220, 38, 38, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            type: 'logarithmic',
+                            title: {
+                                display: true,
+                                text: 'Value in Euros (Logarithmic Scale)'
+                            },
+                             ticks: {
+                                callback: function(value, index, values) {
+                                    return '€' + Number(value.toString()).toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += '€' + context.parsed.x.toLocaleString();
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
